@@ -5,8 +5,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-slate-900">Tür Yönetimi</h1>
-            <p class="text-sm text-slate-600 mt-0.5">İçerik türleri ve alt türler</p>
+            <h1 class="text-2xl font-bold text-slate-900">Ayarlar</h1>
+            <p class="text-sm text-slate-600 mt-0.5">İçerik türleri ve ders moderatör yönetimi</p>
           </div>
           <router-link
             to="/"
@@ -22,33 +22,124 @@
     </header>
 
     <div class="max-w-full mx-auto px-2 sm:px-3 py-4">
-      <!-- Yeni Tür Ekleme -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-        <div class="flex gap-3">
-          <input
-            v-model="yeniTur"
-            type="text"
-            placeholder="Yeni tür adı..."
-            class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            @keyup.enter="turEkle"
-          />
+      <!-- Sekmeler -->
+      <div class="bg-white rounded-t-xl shadow-sm border border-slate-200 border-b-0">
+        <div class="flex border-b border-slate-200">
           <button
-            @click="turEkle"
-            :disabled="!yeniTur.trim()"
-            class="px-5 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-sm"
+            @click="aktifSekme = 'moderator'"
+            :class="[
+              'flex-1 px-6 py-3 text-sm font-medium transition-all',
+              aktifSekme === 'moderator'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            ]"
           >
-            + Tür Ekle
+            Moderatör
+          </button>
+          <button
+            @click="aktifSekme = 'turler'"
+            :class="[
+              'flex-1 px-6 py-3 text-sm font-medium transition-all',
+              aktifSekme === 'turler'
+                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            ]"
+          >
+            İçerik Türleri
           </button>
         </div>
       </div>
 
-      <!-- Loading -->
-      <div v-if="yukleniyor" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-10 w-10 border-3 border-slate-300 border-t-blue-600"></div>
+      <!-- Moderatör Sekmesi -->
+      <div v-show="aktifSekme === 'moderator'" class="bg-white rounded-b-xl shadow-sm border border-slate-200 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Ders Moderatörleri</h3>
+        <div v-if="derslerYukleniyor" class="text-center py-4">
+          <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-slate-300 border-t-blue-600"></div>
+        </div>
+        <div v-else class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left py-3 px-4 font-semibold text-slate-700">Ders Adı</th>
+                <th class="text-left py-3 px-4 font-semibold text-slate-700">Moderatör</th>
+                <th class="text-center py-3 px-4 font-semibold text-slate-700 w-24">İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="ders in dersler" :key="ders.ders_adi" class="border-b border-slate-100 hover:bg-slate-50">
+                <td class="py-3 px-4 font-medium text-slate-800">{{ ders.ders_adi }}</td>
+                <td class="py-3 px-4">
+                  <input
+                    v-if="duzenleniyorDers === ders.ders_adi"
+                    v-model="duzenleniyorModerator"
+                    type="text"
+                    class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Moderatör adı..."
+                    @keyup.enter="dersGuncelle(ders)"
+                    @keyup.esc="duzenleniyorDers = null"
+                  />
+                  <span v-else class="text-slate-600">{{ ders.moderator || '-' }}</span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <div v-if="duzenleniyorDers === ders.ders_adi" class="flex justify-center gap-1">
+                    <button
+                      @click="dersGuncelle(ders)"
+                      class="px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700"
+                      title="Kaydet"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      @click="duzenleniyorDers = null"
+                      class="px-3 py-1.5 bg-slate-600 text-white text-xs rounded-lg hover:bg-slate-700"
+                      title="İptal"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <button
+                    v-else
+                    @click="dersDuzenleBaslat(ders)"
+                    class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700"
+                  >
+                    Düzenle
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Türler Grid -->
-      <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- İçerik Türleri Sekmesi -->
+      <div v-show="aktifSekme === 'turler'">
+        <!-- Yeni Tür Ekleme -->
+        <div class="bg-white rounded-t-xl shadow-sm border border-slate-200 border-b-0 p-4 mb-0">
+          <div class="flex gap-3">
+            <input
+              v-model="yeniTur"
+              type="text"
+              placeholder="Yeni tür adı..."
+              class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              @keyup.enter="turEkle"
+            />
+            <button
+              @click="turEkle"
+              :disabled="!yeniTur.trim()"
+              class="px-5 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-sm"
+            >
+              + Tür Ekle
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="yukleniyor" class="text-center py-12 bg-white rounded-b-xl shadow-sm border border-slate-200 border-t-0">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-3 border-slate-300 border-t-blue-600"></div>
+        </div>
+
+        <!-- Türler Grid -->
+        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white rounded-b-xl shadow-sm border border-slate-200 border-t-0 p-4">
         <div
           v-for="tur in turler"
           :key="tur.id"
@@ -209,6 +300,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -221,8 +313,10 @@ export default {
   data() {
     return {
       yukleniyor: true,
+      derslerYukleniyor: true,
       turler: [],
       altTurler: [],
+      dersler: [],
       yeniTur: '',
       yeniAltTur: {},
       yeniAltTurAciklama: {},
@@ -230,7 +324,10 @@ export default {
       duzenleniyorTurAdi: '',
       duzenleniyorAltTur: null,
       duzenleniyorAltTurAdi: '',
-      duzenleniyorAltTurAciklama: ''
+      duzenleniyorAltTurAciklama: '',
+      duzenleniyorDers: null,
+      duzenleniyorModerator: '',
+      aktifSekme: 'moderator'
     }
   },
   computed: {
@@ -246,7 +343,7 @@ export default {
     }
   },
   async mounted() {
-    await this.verileriYukle()
+    await Promise.all([this.verileriYukle(), this.dersleriYukle()])
   },
   methods: {
     async verileriYukle() {
@@ -273,9 +370,61 @@ export default {
 
       } catch (error) {
         console.error('Veriler yüklenirken hata:', error)
-        alert('Veriler yüklenirken bir hata oluştu: ' + error.message)
       } finally {
         this.yukleniyor = false
+      }
+    },
+
+    async dersleriYukle() {
+      try {
+        this.derslerYukleniyor = true
+
+        // Benzersiz dersleri ve moderatörlerini yükle
+        const { data, error } = await supabase
+          .from('icerik_kayitlari')
+          .select('ders_adi, moderator')
+
+        if (error) throw error
+
+        // Benzersiz dersleri grupla
+        const dersMap = new Map()
+        data.forEach(row => {
+          if (!dersMap.has(row.ders_adi)) {
+            dersMap.set(row.ders_adi, row.moderator)
+          }
+        })
+
+        this.dersler = Array.from(dersMap, ([ders_adi, moderator]) => ({
+          ders_adi,
+          moderator
+        })).sort((a, b) => a.ders_adi.localeCompare(b.ders_adi, 'tr'))
+
+      } catch (error) {
+        console.error('Dersler yüklenirken hata:', error)
+      } finally {
+        this.derslerYukleniyor = false
+      }
+    },
+
+    dersDuzenleBaslat(ders) {
+      this.duzenleniyorDers = ders.ders_adi
+      this.duzenleniyorModerator = ders.moderator || ''
+    },
+
+    async dersGuncelle(ders) {
+      try {
+        const { error } = await supabase
+          .from('icerik_kayitlari')
+          .update({ moderator: this.duzenleniyorModerator.trim() || null })
+          .eq('ders_adi', ders.ders_adi)
+
+        if (error) throw error
+
+        ders.moderator = this.duzenleniyorModerator.trim() || null
+        this.duzenleniyorDers = null
+      } catch (error) {
+        console.error('Moderatör güncellenirken hata:', error)
+
       }
     },
 
@@ -293,10 +442,8 @@ export default {
         this.turler.push(data[0])
         this.turler.sort((a, b) => a.icerik_turu.localeCompare(b.icerik_turu, 'tr'))
         this.yeniTur = ''
-        alert('Tür başarıyla eklendi!')
       } catch (error) {
         console.error('Tür eklenirken hata:', error)
-        alert('Tür eklenirken bir hata oluştu: ' + error.message)
       }
     },
 
@@ -319,10 +466,9 @@ export default {
         tur.icerik_turu = this.duzenleniyorTurAdi.trim()
         this.duzenleniyorTur = null
         this.turler.sort((a, b) => a.icerik_turu.localeCompare(b.icerik_turu, 'tr'))
-        alert('Tür başarıyla güncellendi!')
       } catch (error) {
         console.error('Tür güncellenirken hata:', error)
-        alert('Tür güncellenirken bir hata oluştu: ' + error.message)
+
       }
     },
 
@@ -344,10 +490,9 @@ export default {
 
         this.turler = this.turler.filter(t => t.id !== tur.id)
         this.altTurler = this.altTurler.filter(at => at.icerik_turu_id !== tur.id)
-        alert('Tür başarıyla silindi!')
       } catch (error) {
         console.error('Tür silinirken hata:', error)
-        alert('Tür silinirken bir hata oluştu: ' + error.message)
+
       }
     },
 
@@ -369,10 +514,8 @@ export default {
         this.altTurler.push(data[0])
         this.yeniAltTur[turId] = ''
         this.yeniAltTurAciklama[turId] = ''
-        alert('Alt tür başarıyla eklendi!')
       } catch (error) {
         console.error('Alt tür eklenirken hata:', error)
-        alert('Alt tür eklenirken bir hata oluştu: ' + error.message)
       }
     },
 
@@ -399,10 +542,9 @@ export default {
         altTur.alt_tur_adi = this.duzenleniyorAltTurAdi.trim()
         altTur.aciklama = this.duzenleniyorAltTurAciklama.trim() || null
         this.duzenleniyorAltTur = null
-        alert('Alt tür başarıyla güncellendi!')
       } catch (error) {
         console.error('Alt tür güncellenirken hata:', error)
-        alert('Alt tür güncellenirken bir hata oluştu: ' + error.message)
+
       }
     },
 
@@ -418,10 +560,9 @@ export default {
         if (error) throw error
 
         this.altTurler = this.altTurler.filter(at => at.id !== altTur.id)
-        alert('Alt tür başarıyla silindi!')
       } catch (error) {
         console.error('Alt tür silinirken hata:', error)
-        alert('Alt tür silinirken bir hata oluştu: ' + error.message)
+
       }
     }
   }

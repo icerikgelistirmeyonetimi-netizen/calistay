@@ -2,7 +2,7 @@
   <div class="space-y-1.5">
     <!-- Tür Seçimi -->
     <select
-      v-if="!isAdded"
+      v-if="!isAdded && isLoggedIn"
       v-model="selectedTur"
       @change="onTurChange"
       :disabled="saving"
@@ -16,7 +16,7 @@
 
     <!-- Alt Tür Seçimi (Tür seçildiğinde gösterilir) -->
     <select
-      v-if="selectedTur && !isAdded"
+      v-if="selectedTur && !isAdded && isLoggedIn"
       v-model="selectedAltTur"
       @change="onAltTurChange"
       :disabled="saving"
@@ -30,7 +30,7 @@
 
     <!-- Ekle Butonu (Alt tür seçildiğinde gösterilir) -->
     <button
-      v-if="selectedTur && selectedAltTur && !isAdded"
+      v-if="selectedTur && selectedAltTur && !isAdded && isLoggedIn"
       @click="onEkle"
       :disabled="saving"
       :class="error ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
@@ -80,6 +80,7 @@
         <div class="text-xs text-slate-600 truncate">{{ getAltTurAdi(currentAltTurId) }}</div>
       </div>
       <button
+        v-if="isLoggedIn"
         @click="onSil"
         class="flex-shrink-0 p-1 text-red-600 hover:bg-red-100 rounded transition-all"
         title="Sil"
@@ -111,6 +112,10 @@ export default {
     altTurler: {
       type: Array,
       required: true
+    },
+    isLoggedIn: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
