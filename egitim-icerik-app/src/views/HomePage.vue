@@ -92,15 +92,15 @@
       </div>
 
       <div v-else>
-        <!-- Tüm Dersler -->
-        <div v-if="dogmDersler.length > 0" class="mb-6">
+        <!-- GM'lere göre gruplandırılmış dersler -->
+        <div v-for="gmName in sortedGmNames" :key="gmName" class="mb-6">
           <div class="flex items-center gap-2 mb-3">
-            <h2 class="text-lg font-semibold text-slate-900">Dersler</h2>
-            <span class="text-sm text-slate-500">({{ dogmDersler.length }} ders)</span>
+            <h2 class="text-lg font-semibold text-slate-900">{{ gmName }}</h2>
+            <span class="text-sm text-slate-500">({{ gmGroups[gmName].length }} ders)</span>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             <button
-              v-for="ders in dogmDersler"
+              v-for="ders in gmGroups[gmName]"
               :key="ders"
               @click="goDersDetay(ders)"
               class="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl p-4 transition-all shadow-sm hover:shadow-md text-left relative"
@@ -128,61 +128,6 @@
                 </div>
                 <div class="flex flex-col items-end gap-2">
                   <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                  <!-- Tamamlanma yüzdesi badge -->
-                  <div 
-                    class="px-2.5 py-1 rounded-full text-xs font-bold shadow-sm"
-                    :class="{
-                      'bg-green-100 text-green-700': dersTamamlanmaYuzdeleri[ders] === 100,
-                      'bg-yellow-100 text-yellow-700': dersTamamlanmaYuzdeleri[ders] >= 50 && dersTamamlanmaYuzdeleri[ders] < 100,
-                      'bg-red-100 text-red-700': dersTamamlanmaYuzdeleri[ders] < 50
-                    }"
-                  >
-                    %{{ dersTamamlanmaYuzdeleri[ders] }}
-                  </div>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <!-- ÖERHGM Dersleri -->
-        <div v-if="oerhgmDersler.length > 0" class="mb-6">
-          <div class="flex items-center gap-2 mb-3">
-            <h2 class="text-lg font-semibold text-slate-900">Özel Eğitim ve Rehberlik Hizmetleri Genel Müdürlüğü</h2>
-            <span class="text-sm text-slate-500">({{ oerhgmDersler.length }} ders)</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            <button
-              v-for="ders in oerhgmDersler"
-              :key="ders"
-              @click="goDersDetay(ders)"
-              class="group bg-white hover:bg-green-50 border border-slate-200 hover:border-green-300 rounded-xl p-4 transition-all shadow-sm hover:shadow-md text-left relative"
-            >
-              <div class="flex items-start justify-between">
-                <div class="flex-1 min-w-0">
-                  <h3 class="text-sm font-semibold text-slate-900 truncate group-hover:text-green-600 transition-colors">{{ ders }}</h3>
-                  <p class="text-xs text-slate-500 mt-1">
-                    {{ dersIcerikSayilari[ders] || 0 }} içerik
-                  </p>
-                  <p 
-                    v-if="dersKatilimcilari[ders]"
-                    class="text-xs text-slate-400 mt-2"
-                    :title="dersKatilimcilari[ders]"
-                  >
-                    <span class="font-medium text-slate-500">Katılımcılar:</span> {{ dersKatilimcilari[ders] }}
-                  </p>
-                  <p 
-                    v-if="dersModeratorleri[ders]"
-                    class="text-xs text-slate-400 mt-1"
-                    :title="dersModeratorleri[ders]"
-                  >
-                    <span class="font-medium text-slate-500">Moderatör:</span> {{ dersModeratorleri[ders] }}
-                  </p>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                  <svg class="w-5 h-5 text-slate-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
                   <!-- Tamamlanma yüzdesi badge -->
@@ -232,17 +177,35 @@ export default {
       loginUsername: '',
       loginPassword: '',
       loginError: '',
-      loginLoading: false
+      loginLoading: false,
+      showEski: false
     }
   },
   computed: {
-    dogmDersler() {
-      // GM filtresi kaldırıldı - tüm dersler gösteriliyor
-      return this.dersler
+    // GM'lere göre gruplandırılmış dersler
+    gmGroups() {
+      const groups = {}
+      
+      this.dersler.forEach(ders => {
+        const gm = this.dersGmBilgisi[ders] || 'Diğer'
+        
+        if (!groups[gm]) {
+          groups[gm] = []
+        }
+        groups[gm].push(ders)
+      })
+      
+      return groups
     },
-    oerhgmDersler() {
-      // Boş döndür - tüm dersler dogmDersler'de gösterilecek
-      return []
+    // GM isimlerini sıralı olarak döndür
+    sortedGmNames() {
+      return Object.keys(this.gmGroups).sort()
+    }
+  },
+  watch: {
+    // showEski değiştiğinde verileri yeniden yükle
+    showEski() {
+      this.loadDersler()
     }
   },
   async mounted() {
@@ -359,42 +322,44 @@ export default {
         this.userModeratorDersler = []
       }
     },
-    async loadDersler() {
-      try {
-        const { data, error } = await supabase
-          .from('icerik_kayitlari')
-          .select('ders_adi, gm, katilimci, moderator, tur_1_id, tur_2_id, tur_3_id, tur_4_id, tur_5_id')
+async loadDersler() {
+  try {
+    this.loading = true;
 
-        if (error) throw error
+    // View üzerinden veri çekiyoruz
+    let query = supabase
+      .from('ders_ozet_view')
+      .select('*')
+      .order('ders_adi');
 
-        // Benzersiz ders adlarını al
-        const uniqueDersler = [...new Set(data.map(item => item.ders_adi).filter(Boolean))]
-        this.dersler = uniqueDersler.sort()
+    // Durum filtresi (View içinde gruplandığı için direkt filtreleyebiliriz)
+    if (this.showEski) {
+      query = query.eq('durum', false);
+    } else {
+      query = query.eq('durum', true);
+    }
 
-        // Her ders için içerik sayısını, GM, katılımcı bilgisini ve tamamlanma yüzdesini hesapla
-        this.dersler.forEach(ders => {
-          const dersVerileri = data.filter(item => item.ders_adi === ders)
-          this.dersIcerikSayilari[ders] = dersVerileri.length
-          this.dersGmBilgisi[ders] = dersVerileri[0]?.gm || ''
-          this.dersKatilimcilari[ders] = dersVerileri[0]?.katilimci || ''
-          this.dersModeratorleri[ders] = dersVerileri[0]?.moderator || ''
-          
-          // En az 1 öncelik girilmiş kazanımları say
-          const tamamlananKazanimlar = dersVerileri.filter(item => 
-            item.tur_1_id || item.tur_2_id || item.tur_3_id || item.tur_4_id || item.tur_5_id
-          ).length
-          
-          const yuzde = dersVerileri.length > 0 
-            ? Math.round((tamamlananKazanimlar / dersVerileri.length) * 100)
-            : 0
-          this.dersTamamlanmaYuzdeleri[ders] = yuzde
-        })
-      } catch (error) {
-        console.error('Dersler yüklenirken hata:', error)
-      } finally {
-        this.loading = false
-      }
-    },
+    const { data, error } = await query;
+    if (error) throw error;
+
+    // Verileri State'e aktarma (View'dan gelen hazır kolonları kullanıyoruz)
+    this.dersler = data.map(item => item.ders_adi);
+    
+    data.forEach(item => {
+      const ders = item.ders_adi;
+      this.dersIcerikSayilari[ders] = item.toplam_icerik;
+      this.dersGmBilgisi[ders] = item.gm || '';
+      this.dersKatilimcilari[ders] = item.katilimci || '';
+      this.dersModeratorleri[ders] = item.moderator || '';
+      this.dersTamamlanmaYuzdeleri[ders] = item.tamamlanma_yuzdesi;
+    });
+
+  } catch (error) {
+    console.error('Dersler yüklenirken hata:', error);
+  } finally {
+    this.loading = false;
+  }
+},
     goDersDetay(dersAdi) {
       this.$router.push({ name: 'dersDetay', params: { dersAdi } })
     },

@@ -20,16 +20,18 @@
     </div>
     
     <div class="overflow-x-auto">
-      <table class="w-full">
+      <table class="w-full table-fixed">
         <thead class="bg-slate-50 border-b-2 border-slate-200">
           <tr>
-            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase min-w-[14rem]">Öğrenme Çıktısı</th>
-            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase min-w-[12rem]">Açıklama</th>
-            <th class="px-2 py-2 text-center text-xs font-semibold text-slate-700 uppercase w-28">İçerİk Türü</th>
-            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase w-32">1. ÖNCELİK</th>
-            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase w-32">2. ÖNCELİK</th>
-            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase w-32">3. ÖNCELİK</th>
-            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase w-40">DİĞER</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 20%;">Öğrenme Çıktısı</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 15%;">Açıklama</th>
+            <th class="px-2 py-2 text-center text-xs font-semibold text-slate-700 uppercase" style="width: 8%;">İçerİk Türü</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 9%;">1. ÖNCELİK</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 9%;">2. ÖNCELİK</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 9%;">3. ÖNCELİK</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 9%;">ZENGİNLEŞTİRME</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 9%;">Destekleme</th>
+            <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 uppercase" style="width: 12%;">DİĞER</th>
           </tr>
         </thead>
         <tbody>
@@ -38,31 +40,49 @@
             <tr class="bg-gradient-to-r from-slate-100 to-slate-50">
               <template v-if="hasKazanim(icerikler)">
                 <!-- Sadece ünite başlığı göster -->
-                <td colspan="9" class="px-2 py-2">
-                  <h3 
-                    v-if="isLoggedIn"
-                    @click="openUniteModal(unite, icerikler)"
-                    class="text-xs font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors"
-                  >
-                    {{ unite }}
-                  </h3>
-                  <h3 
-                    v-else
-                    class="text-xs font-bold text-slate-800"
-                  >
-                    {{ unite }}
-                  </h3>
+                <td colspan="11" class="px-2 py-2">
+                  <div class="flex items-center gap-2">
+                    <h3 
+                      v-if="isLoggedIn"
+                      @click="openUniteModal(unite, icerikler)"
+                      class="text-xs font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors"
+                    >
+                      {{ unite }}
+                    </h3>
+                    <h3 
+                      v-else
+                      class="text-xs font-bold text-slate-800"
+                    >
+                      {{ unite }}
+                    </h3>
+                    <button
+                      @click="openUniteBilgiModal(icerikler[0].unite_id)"
+                      class="px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors text-sm text-blue-600 font-medium group"
+                      title="Ünite Bilgileri"
+                    >
+                      <span class="group-hover:text-blue-700">Ünite Bilgileri</span>
+                    </button>
+                  </div>
                 </td>
               </template>
               <template v-else>
                 <!-- Ünite için seçim yapılabilir -->
                 <td class="px-2 py-2 align-top">
-                  <h3 class="text-xs font-bold text-slate-800">{{ unite }}</h3>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-xs font-bold text-slate-800">{{ unite }}</h3>
+                    <button
+                      @click="openUniteBilgiModal(icerikler[0].unite_id)"
+                      class="px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors text-sm text-blue-600 font-medium group"
+                      title="Ünite Bilgileri"
+                    >
+                      <span class="group-hover:text-blue-700">Ünite Bilgileri</span>
+                    </button>
+                  </div>
                 </td>
                 <td class="px-2 py-2 text-xs text-slate-600 align-top">
                   <div 
                     v-if="icerikler[0]?.aciklama"
-                    class="cursor-pointer hover:text-blue-600 transition-colors whitespace-pre-wrap"
+                    class="cursor-pointer hover:text-blue-600 transition-colors line-clamp-3"
                     @click="showAciklama(icerikler[0].aciklama)"
                   >
                     {{ icerikler[0].aciklama }}
@@ -76,7 +96,7 @@
                   </span>
                 </td>
                 <!-- Sütun 1-3 (eşit ve sabit genişlik) -->
-                <td v-for="col in 3" :key="col" class="px-2 py-2 align-top w-32 min-w-[8rem]">
+                <td v-for="col in 5" :key="col" class="px-2 py-2 align-top">
                   <TurSecici
                     :icerik="icerikler[0]"
                     :column="col"
@@ -129,7 +149,7 @@
                 <td class="px-2 py-2 text-xs text-slate-700 align-top">{{ icerik.kazanim }}</td>
                 <td class="px-2 py-2 text-xs text-slate-600 align-top">
                   <div 
-                    class="cursor-pointer hover:text-blue-600 transition-colors whitespace-pre-wrap"
+                    class="cursor-pointer hover:text-blue-600 transition-colors line-clamp-3"
                     @click="showAciklama(icerik.aciklama)"
                   >
                     {{ icerik.aciklama || '-' }}
@@ -143,7 +163,7 @@
                 </td>
                 
                 <!-- Sütun 1-3 (eşit ve sabit genişlik) -->
-                <td v-for="col in 3" :key="col" class="px-2 py-2 align-top w-32 min-w-[8rem]">
+                <td v-for="col in 5" :key="col" class="px-2 py-2 align-top">
                   <TurSecici
                     :icerik="icerik"
                     :column="col"
@@ -215,6 +235,138 @@
         </div>
         <div class="p-6">
           <p class="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{{ modalAciklama }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ünite Bilgi Modal -->
+    <div
+      v-if="showUniteBilgiModal"
+      @click="closeUniteBilgiModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
+      <div
+        @click.stop
+        class="bg-white rounded-xl shadow-2xl w-[95vw] lg:w-[90vw] max-h-[95vh] overflow-hidden flex flex-col"
+      >
+        <div class="flex items-center justify-between p-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-blue-100 rounded-lg">
+              <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-slate-900">Ünite Bilgileri</h3>
+              <p v-if="uniteBilgi" class="text-sm text-slate-600 mt-0.5">{{ uniteBilgi.unite_adi }}</p>
+            </div>
+          </div>
+          <button
+            @click="closeUniteBilgiModal"
+            class="p-2 hover:bg-white rounded-lg transition-colors"
+          >
+            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div v-if="uniteBilgiLoading" class="flex-1 flex items-center justify-center p-12">
+          <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+            <p class="mt-4 text-sm text-slate-600">Ünite bilgileri yükleniyor...</p>
+          </div>
+        </div>
+
+        <div v-else-if="!uniteBilgi" class="flex-1 flex items-center justify-center p-12">
+          <div class="text-center">
+            <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-slate-600 font-medium">Ünite bilgisi bulunamadı</p>
+          </div>
+        </div>
+
+        <div v-else class="flex-1 flex overflow-hidden">
+          <!-- Yan Menü -->
+          <div class="w-96 border-r border-slate-200 bg-slate-50 overflow-y-auto">
+            <div class="p-4">
+              <h4 class="text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wide">İÇİNDEKİLER</h4>
+              <div class="space-y-1">
+                <button
+                  v-for="(section, index) in uniteSections"
+                  :key="index"
+                  @click="scrollToSection(index)"
+                  :class="[
+                    'w-full text-left px-3 py-2.5 rounded-lg transition-all text-sm',
+                    activeSectionIndex === index
+                      ? 'bg-blue-600 text-white font-medium shadow-sm'
+                      : 'text-slate-700 hover:bg-white hover:shadow-sm'
+                  ]"
+                >
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span class="line-clamp-2">{{ section.title }}</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- İçerik Alanı -->
+          <div class="flex-1 overflow-y-auto" ref="uniteBilgiContent">
+            <div class="p-6">
+              <div v-if="uniteSections.length === 0" class="text-center py-12">
+                <p class="text-slate-500">Bu ünite için bölüm bulunamadı.</p>
+              </div>
+              <div v-else class="space-y-6">
+                <div
+                  v-for="(section, index) in uniteSections"
+                  :key="index"
+                  :ref="`section-${index}`"
+                  class="scroll-mt-4"
+                >
+                  <button
+                    @click="toggleSection(index)"
+                    class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-slate-100 to-slate-50 hover:from-slate-200 hover:to-slate-100 rounded-lg transition-all border border-slate-200"
+                  >
+                    <h3 class="text-lg font-bold text-slate-900 text-left">{{ section.title }}</h3>
+                    <svg
+                      :class="[
+                        'w-5 h-5 text-slate-600 transition-transform',
+                        section.expanded ? 'rotate-180' : ''
+                      ]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  <div
+                    v-show="section.expanded"
+                    class="mt-3 p-5 bg-white rounded-lg border border-slate-200 shadow-sm"
+                  >
+                    <div
+                      v-html="section.content"
+                      class="unite-content text-slate-700 leading-relaxed"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 p-4 bg-slate-50">
+          <button
+            @click="closeUniteBilgiModal"
+            class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            Kapat
+          </button>
         </div>
       </div>
     </div>
@@ -321,6 +473,15 @@
               v-model="modalNewKazanim"
               rows="3"
               placeholder="Yeni kazanım girin..."
+              class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            ></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Açıklama</label>
+            <textarea
+              v-model="modalNewAciklama"
+              rows="3"
+              placeholder="Açıklama girin..."
               class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             ></textarea>
           </div>
@@ -450,6 +611,15 @@
               class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             ></textarea>
           </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Açıklama</label>
+            <textarea
+              v-model="editAciklamaText"
+              rows="3"
+              placeholder="İsteğe bağlı açıklama"
+              class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            ></textarea>
+          </div>
           <div class="flex justify-end gap-2">
             <button
               @click="closeEditKazanimModal"
@@ -506,6 +676,7 @@ export default {
       modalSelectedUnite: '',
       modalNewUnite: '',
       modalNewKazanim: '',
+      modalNewAciklama: '',
       addModalSaving: false,
       showUniteModal: false,
       editUniteAdi: '',
@@ -516,12 +687,18 @@ export default {
       showEditKazanimModal: false,
       editKazanimIcerik: null,
       editKazanimText: '',
+      editAciklamaText: '',
       kazanimSaving: false,
       digerSaving: {},
       digerSaved: {},
       digerError: {},
       newKazanim: {},
-      newUnite: {}
+      newUnite: {},
+      showUniteBilgiModal: false,
+      uniteBilgi: null,
+      uniteBilgiLoading: false,
+      uniteSections: [],
+      activeSectionIndex: 0
     }
   },
   computed: {
@@ -650,6 +827,164 @@ export default {
     closeModal() {
       this.modalAciklama = null
     },
+
+    parseSectionsFromHTML(html) {
+      if (!html) return []
+
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(html, 'text/html')
+      const sections = []
+      
+      // Genel Bilgiler ve Öğrenme Çıktıları gibi başlıkları POPUP'ta GİZLE
+      const genelBilgilerBasliklari = [
+        'Ders Saati',
+        'Alan Becerileri',
+        'Kavramsal Beceriler',
+        'Eğilimler',
+        'Sosyal-Duygusal Öğrenme Becerileri',
+        'Değerler',
+        'Okuryazarlık Becerileri',
+        'Disiplinler Arası İlişkiler',
+        'Beceriler Arası İlişkiler',
+        'Anahtar Kavramlar'
+      ]
+
+      const otherSections = []
+
+      // .title class'ına sahip elementleri bul
+      const titleElements = doc.querySelectorAll('.title')
+
+      titleElements.forEach((titleEl, index) => {
+        const title = titleEl.textContent.trim() || `Bölüm ${index + 1}`
+        const lower = title.toLowerCase()
+
+        // Gizlenecek başlıklar: Genel Bilgiler listesi veya "öğrenme çıkt" içeren başlıklar
+        const isGenelBilgi = genelBilgilerBasliklari.some(baslik => lower.includes(baslik.toLowerCase()))
+        const isOgrenme = lower.includes('öğrenme çıkt') || lower.includes('öğrenme çıktıları')
+
+        if (isGenelBilgi || isOgrenme) {
+          // Atla (gizle)
+          return
+        }
+
+        // Bu title'dan sonraki içeriği topla (bir sonraki title'a kadar)
+        let content = ''
+        let currentEl = titleEl.nextElementSibling
+
+        while (currentEl && !currentEl.classList.contains('title')) {
+          content += currentEl.outerHTML
+          currentEl = currentEl.nextElementSibling
+        }
+
+        otherSections.push({
+          title: title,
+          content: content,
+          expanded: false
+        })
+      })
+
+      // Diğer bölümleri ekle (gizlenenler artık yok)
+      otherSections.forEach((section, index) => {
+        sections.push({
+          ...section,
+          expanded: sections.length === 0 && index === 0 // İlk görünen bölüm açık
+        })
+      })
+
+      // Eğer hiç .title yoksa veya tüm başlıklar gizlendiyse, HTML'i temizleyip göster
+      if (sections.length === 0) {
+        const clone = doc.cloneNode(true)
+        const tEls = clone.querySelectorAll('.title')
+        tEls.forEach(titleEl => {
+          const ttl = titleEl.textContent.trim().toLowerCase()
+          const isGenel = genelBilgilerBasliklari.some(b => ttl.includes(b.toLowerCase()))
+          const isOgr = ttl.includes('öğrenme çıkt') || ttl.includes('öğrenme çıktıları')
+          if (isGenel || isOgr) {
+            // Başlığı ve takip eden içeriği kaldır
+            let next = titleEl.nextElementSibling
+            titleEl.remove()
+            while (next && !next.classList.contains('title')) {
+              const toRemove = next
+              next = next.nextElementSibling
+              toRemove.remove()
+            }
+          }
+        })
+
+        const cleaned = clone.body ? clone.body.innerHTML : ''
+        sections.push({
+          title: 'İçerik',
+          content: cleaned || html,
+          expanded: true
+        })
+      }
+
+      // Eğer hiç .title yoksa, tüm HTML'i tek bölüm olarak göster
+      if (sections.length === 0) {
+        sections.push({
+          title: 'İçerik',
+          content: html,
+          expanded: true
+        })
+      }
+
+      return sections
+    },
+
+    async openUniteBilgiModal(uniteId) {
+      if (!uniteId) {
+        console.warn('Unite ID bulunamadı')
+        return
+      }
+
+      this.showUniteBilgiModal = true
+      this.uniteBilgiLoading = true
+      this.uniteBilgi = null
+      this.uniteSections = []
+      this.activeSectionIndex = 0
+
+      try {
+        const { data, error } = await supabase
+          .from('unite_bilgileri')
+          .select('id, unite_adi, html')
+          .eq('id', uniteId)
+          .single()
+
+        if (error) throw error
+        this.uniteBilgi = data
+        this.uniteSections = this.parseSectionsFromHTML(data.html)
+      } catch (error) {
+        console.error('Ünite bilgisi yüklenirken hata:', error)
+        this.uniteBilgi = null
+        this.uniteSections = []
+      } finally {
+        this.uniteBilgiLoading = false
+      }
+    },
+
+    closeUniteBilgiModal() {
+      this.showUniteBilgiModal = false
+      this.uniteBilgi = null
+      this.uniteBilgiLoading = false
+      this.uniteSections = []
+      this.activeSectionIndex = 0
+    },
+
+    toggleSection(index) {
+      this.uniteSections[index].expanded = !this.uniteSections[index].expanded
+    },
+
+    scrollToSection(index) {
+      this.activeSectionIndex = index
+      const sectionRef = this.$refs[`section-${index}`]
+      if (sectionRef && sectionRef[0]) {
+        sectionRef[0].scrollIntoView({ behavior: 'smooth', block: 'start' })
+        // Bölümü aç
+        if (!this.uniteSections[index].expanded) {
+          this.uniteSections[index].expanded = true
+        }
+      }
+    },
     
     openDigerModal(icerik) {
       this.modalDigerIcerik = icerik
@@ -667,6 +1002,7 @@ export default {
       this.modalSelectedUnite = ''
       this.modalNewUnite = ''
       this.modalNewKazanim = ''
+      this.modalNewAciklama = ''
     },
     
     closeAddModal() {
@@ -674,6 +1010,7 @@ export default {
       this.modalSelectedUnite = ''
       this.modalNewUnite = ''
       this.modalNewKazanim = ''
+      this.modalNewAciklama = ''
       this.addModalSaving = false
     },
     
@@ -757,12 +1094,14 @@ export default {
       this.showEditKazanimModal = true
       this.editKazanimIcerik = icerik
       this.editKazanimText = icerik.kazanim || ''
+      this.editAciklamaText = icerik.aciklama || ''
     },
     
     closeEditKazanimModal() {
       this.showEditKazanimModal = false
       this.editKazanimIcerik = null
       this.editKazanimText = ''
+      this.editAciklamaText = ''
       this.kazanimSaving = false
     },
     
@@ -773,15 +1112,20 @@ export default {
       this.kazanimSaving = true
       
       try {
+        const yeniAciklama = this.editAciklamaText?.trim() || null
         const { error } = await supabase
           .from('icerik_kayitlari')
-          .update({ kazanim: yeniKazanim })
+          .update({ 
+            kazanim: yeniKazanim,
+            aciklama: yeniAciklama
+          })
           .eq('id', this.editKazanimIcerik.id)
         
         if (error) throw error
         
         // Local state'i güncelle
         this.editKazanimIcerik.kazanim = yeniKazanim
+        this.editKazanimIcerik.aciklama = yeniAciklama
         
         this.closeEditKazanimModal()
         
@@ -824,6 +1168,7 @@ export default {
     
     async saveAddModal() {
       const kazanim = this.modalNewKazanim?.trim()
+      const aciklama = this.modalNewAciklama?.trim()
       const selectedUnite = this.modalSelectedUnite
       const yeniUnite = this.modalNewUnite?.trim()
       
@@ -841,7 +1186,7 @@ export default {
           sinif: this.sinif,
           unite: selectedUnite === '__NEW__' ? yeniUnite : selectedUnite,
           kazanim: kazanim,
-          aciklama: null,
+          aciklama: aciklama || null,
           icerik_turu: mevcutIcerik?.icerik_turu || null,
           gm: mevcutIcerik?.gm || null,
           katilimci: mevcutIcerik?.katilimci || null
@@ -938,7 +1283,7 @@ export default {
       try {
         const { error } = await supabase
           .from('icerik_kayitlari')
-          .update({
+            .update({
             tur_1_id: icerik.tur_1_id || null,
             alt_tur_1_id: icerik.alt_tur_1_id || null,
             tur_2_id: icerik.tur_2_id || null,
@@ -949,6 +1294,8 @@ export default {
             alt_tur_4_id: icerik.alt_tur_4_id || null,
             tur_5_id: icerik.tur_5_id || null,
             alt_tur_5_id: icerik.alt_tur_5_id || null,
+            zenginlestirme: icerik.alt_tur_4_id || null,
+            destekleme: icerik.alt_tur_5_id || null,
             diger_aciklama: icerik.diger_aciklama || null
           })
           .eq('id', icerik.id)
@@ -964,3 +1311,149 @@ export default {
 }
 </script>
 
+<style scoped>
+
+/* Unite İçerik Styling */
+.unite-content :deep(h1),
+.unite-content :deep(h2),
+.unite-content :deep(h3),
+.unite-content :deep(h4) {
+  @apply font-bold text-slate-900 mt-6 mb-3;
+}
+
+.unite-content :deep(h1) {
+  @apply text-2xl;
+}
+
+.unite-content :deep(h2) {
+  @apply text-xl;
+}
+
+.unite-content :deep(h3) {
+  @apply text-lg;
+}
+
+.unite-content :deep(h4) {
+  @apply text-base;
+}
+
+.unite-content :deep(p) {
+  @apply mb-4 text-slate-700 leading-relaxed;
+}
+
+.unite-content :deep(ul),
+.unite-content :deep(ol) {
+  @apply mb-4 pl-6 space-y-2;
+}
+
+.unite-content :deep(ul) {
+  @apply list-disc;
+}
+
+.unite-content :deep(ol) {
+  @apply list-decimal;
+}
+
+.unite-content :deep(li) {
+  @apply text-slate-700 leading-relaxed;
+}
+
+.unite-content :deep(strong),
+.unite-content :deep(b) {
+  @apply font-semibold text-slate-900;
+}
+
+.unite-content :deep(em),
+.unite-content :deep(i) {
+  @apply italic;
+}
+
+.unite-content :deep(table) {
+  @apply w-full border-collapse mb-4 shadow-sm rounded-lg overflow-hidden;
+}
+
+.unite-content :deep(thead) {
+  @apply bg-slate-100;
+}
+
+.unite-content :deep(th) {
+  @apply px-4 py-2 text-left font-semibold text-slate-900 border border-slate-300;
+}
+
+.unite-content :deep(td) {
+  @apply px-4 py-2 text-slate-700 border border-slate-200;
+}
+
+.unite-content :deep(tbody tr) {
+  @apply transition-colors;
+}
+
+.unite-content :deep(tbody tr:hover) {
+  @apply bg-blue-50;
+}
+
+.unite-content :deep(tbody tr td:first-child) {
+  @apply bg-slate-50 font-semibold;
+}
+
+.unite-content :deep(blockquote) {
+  @apply border-l-4 border-blue-500 pl-4 italic text-slate-600 my-4;
+}
+
+.unite-content :deep(code) {
+  @apply bg-slate-100 px-2 py-1 rounded text-sm font-mono text-slate-800;
+}
+
+.unite-content :deep(pre) {
+  @apply bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto mb-4;
+}
+
+.unite-content :deep(pre code) {
+  @apply bg-transparent p-0 text-slate-100;
+}
+
+.unite-content :deep(a) {
+  @apply text-blue-600 hover:text-blue-700 underline;
+}
+
+.unite-content :deep(hr) {
+  @apply my-6 border-t-2 border-slate-300;
+}
+
+.unite-content :deep(img) {
+  @apply max-w-full h-auto rounded-lg shadow-md my-4;
+}
+
+/* Scrollbar Styling */
+.unite-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.unite-content::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded;
+}
+
+.unite-content::-webkit-scrollbar-thumb {
+  @apply bg-slate-400 rounded hover:bg-slate-500;
+}
+
+/* Scroll margin for section anchors */
+.scroll-mt-4 {
+  scroll-margin-top: 1rem;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
